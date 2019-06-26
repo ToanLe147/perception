@@ -1,0 +1,282 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#"
+     xml:base="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:brainstorm="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasAbility -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasAbility">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#robots"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasLocation -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasLocation">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#robots"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasStatus -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasStatus">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#robots"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#busy -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#busy">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#free -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#free">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#pickable -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#pickable">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#placeable -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#placeable">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#x -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#x">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#y -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#y">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#z -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#z">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#robots -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#robots"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#robots"/>
+        <hasAbility rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#observe"/>
+        <hasLocation rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5_location"/>
+        <hasStatus rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5_status"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5_location -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5_location">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+        <x rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</x>
+        <y rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</y>
+        <z rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</z>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5_status -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UR5_status">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+        <busy rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</busy>
+        <free rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</free>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#driveTo -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#driveTo">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_location -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_location">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+        <x rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</x>
+        <y rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</y>
+        <z rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</z>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_status -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_status">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+        <pickable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</pickable>
+        <placeable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</placeable>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#observe -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#observe">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#pick -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#pick">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#place -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#place">
+        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#robots"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
