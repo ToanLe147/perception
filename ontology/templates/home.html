@@ -1,15 +1,18 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Remote command UI</title>
-</head>
-<body>
+    <title>Web User Interface</title>
 
-<form action="/query" method="POST">
-    <input name="text">
-    <input type="submit" value="Enter">
-</form>
+    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}" rel="stylesheet"></link>
+
+
+</head>
+
+<body bgcolor="#faebd7">
+
+<h1><img src="{{url_for('static', filename='logo-fi-purple-small.png')}}" alt="Tampere University Logo" style="width:300px;height:232.33px;"></h1>
+<h1>Perception System for Robot Manipulator</h1>
 
 </body>
 </html>

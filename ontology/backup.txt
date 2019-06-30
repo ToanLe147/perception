@@ -1,0 +1,18 @@
+<body bgcolor="#faebd7">
+
+<h1><img src="{{url_for('static', filename='logo-fi-purple-small.png')}}" alt="Tampere University Logo" style="width:700px;height:232.33px;"></h1>
+<h1>Perception System for Robot Manipulator</h1>
+<h1>WEB USER INTERFACE</h1>
+
+<h1 class="topic">SERVICE:</h1> <h2 id="service"></h2>
+
+<h1 class="topic">S1000 REAL TIME:</h1> <h2 id="realTime"></h2>
+
+<h1 class="topic">RECEIVED EVENTS:</h1> <h2 id="received_event"></h2>
+
+<h1 class="topic" id="LED">LED OUTPUT:</h1>
+
+
+</body>
+
+PREFIX brainstorm: <http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX br: <http://vocab.deri.ie/br#> SELECT ?x ?y ?z ?status WHERE {brainstorm:bottle_location brainstorm:x ?x. brainstorm:bottle_location brainstorm:y ?y. brainstorm:bottle_location brainstorm:z ?z. brainstorm:bottle_status brainstorm:pickable ?status.}
