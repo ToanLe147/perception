@@ -2,11 +2,10 @@
 # This script is used to test communcation between ontology and ROS
 import rospy
 from std_msgs.msg import String
-import cv2
 
 
 def talker():
-    data = {"1": "bottle/0.23 1.57 3.45",
+    data = {"1": ["bottle/0.23 1.57 3.45"],
             "n": ["bottle/3.5 1.5 0.2", "pencil/2.7 -2.5 0.2", "pencil/-1.5 1.5 0.2"]}
     # pub = rospy.Publisher('chatter', String, queue_size=10)
     pub = rospy.Publisher('objects_detected', String, queue_size=10)
@@ -20,7 +19,7 @@ def talker():
         # else:
         #     user = "not"
 
-        user = data["1"]
+        user = data["n"]
         hello_str = user
         rospy.loginfo(hello_str)
         pub.publish(hello_str)

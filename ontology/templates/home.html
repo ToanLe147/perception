@@ -3,16 +3,64 @@
     <meta charset="UTF-8">
     <title>Web User Interface</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="{{url_for('static', filename='jquery.js')}}"></script>
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}" rel="stylesheet"></link>
-
+    <link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome.min.css')}}">
+    <link href="{{url_for('static', filename='icon/perception.png')}}" rel="shortcut icon"></link>
 
 </head>
 
-<body bgcolor="#faebd7">
+<body>
+    <div class="jumbotron text-center" style="margin-bottom:0">
+        <img src="{{url_for('static', filename='logo-fi-purple-small.png')}}" alt="Tampere University Logo" style="max-width:400px; margin-top:-7px">
+    </div>
 
-<h1><img src="{{url_for('static', filename='logo-fi-purple-small.png')}}" alt="Tampere University Logo" style="width:300px;height:232.33px;"></h1>
-<h1>Perception System for Robot Manipulator</h1>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </nav>
+
+    <h1 class="text-center">Perception System for Robot Manipulator</h1>
+
+    <div class="container">
+        <form class="input-group mb-3" method="POST" action="/query">
+            <input name="inputQuery" type="text" class="form-control" placeholder="Query">
+            <input class="btn btn-primary" type="submit" value="Query">
+        </form>
+
+        <form class="input-group mb-3" method="POST" action="/update">
+            <input name="detectedObject" type="text" class="form-control" placeholder="Detected Object">
+            <input name="btn_object" class="btn btn-success" type="submit" value="Update">
+            <button name="btn_object" value="Delete" type="submit" class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+
+    <h1 class="bg-dark text-white">Get list of Objects</h1>
+
+    <form method="POST" action="/">
+        <div class="row">
+            <div class="col-sm-4">
+                <button class="btn btn-primary">Detect</button>
+            </div>
+            <div class="col-sm-8">
+                <ul class="list-group">
+                    {% for name in names %}
+                        <a href="#" class="list-group-item list-group-item-success">
+                            <input type="hidden" name="handles[]" value="{{ name }}"/> {{ name }}
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </form>
+
+    <div class="jumbotron text-center" style="margin-bottom:0">
+      <p>Footer</p>
+    </div>
 
 </body>
+
 </html>
