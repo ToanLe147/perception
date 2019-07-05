@@ -2,8 +2,9 @@
 
 import requests
 import json
-import rospy
-from flask import Flask, request, render_template, url_for
+import pygal
+from pygal.style import DarkStyle
+from flask import Flask, request, render_template
 
 
 # Flask
@@ -19,7 +20,7 @@ prefix = ('PREFIX brainstorm:<http://www.semanticweb.org/led/ontologies/2019/4/b
 
 
 def update_ontology(detected_object, type):
-    # type: DELETE or INSERT
+    # type is DELETE or INSERT
     name, raw_string = detected_object.split("/")
     location = raw_string.split(" ")
     # Prepair message
@@ -43,10 +44,9 @@ def update_ontology(detected_object, type):
     # send POST request to server
     msg = {'update': prefix + type + insert}
     requests.post(url=ontology_server+'update', headers=header, data=msg)
-    return name
 
 
-def get_position(name):
+def get_info(name):
     query = ("SELECT ?x ?y ?z ?status " +
              "WHERE { " +
              "brainstorm:{}_location brainstorm:x ?x. ".format(name) +
@@ -85,31 +85,58 @@ def index():
     return render_template("home.html")
 
 
-@app.route("/update", methods=['POST'])
-def update():
-    user = request.form['detectedObject']
-    res = "Nothing"
-    if request.form['btn_object'] == "Update":
-        res = update_ontology(user, "INSERT")
-    if request.form['btn_object'] == "Delete":
-        res = update_ontology(user, "DELETE")
-    return render_template("home.html", object=res)
+@app.route("/perception")
+def move_to_knowleadge_base():
+    return render_template("actions.html")
 
 
-@app.route("/query", methods=['POST'])
-def query():
-    user = request.form['inputQuery']
-    load = get_position(user)
-    return str(load)
+@app.route("/visual")
+def move_to_visual():
+    names = get_name()
+    graph = pygal.XY(stroke=False, style=DarkStyle)
+    graph.title = 'Object Position'
+
+    for name in names:
+        x, y, _ = get_info(name)[name]["location"]
+        graph.add(name, [{'value': (x, y), 'node': {'r': 6}}])
+
+    graph_data = graph.render_data_uri()
+    return render_template("visual.html", graph_data=graph_data)
 
 
-@app.route("/observe", methods=['POST'])
-def Observe():
+@app.route("/perception/actions", methods=['POST'])
+def actions():
+    btn = request.form['btn_object']
+    update = request.form['detectedObject']
     names = request.form.getlist('handles[]')
     object_list = get_name()
-    if not names:
-        names = object_list
-    return render_template('home.html', names=names)
+
+    if btn == "Observe":
+        if not names:
+            names = object_list
+
+    if update:
+        if btn == "Update":
+            update_ontology(update, "INSERT")
+            names = []
+
+        if btn == "Delete":
+            update_ontology(update, "DELETE")
+            names = []
+
+    return render_template("actions.html", names=names)
+
+
+@app.route("/perception/actions/<name>", methods=['GET'])
+def show_pos(name):
+    pos = request.form.getlist('pos[]')
+    status = request.form.getlist('status[]')
+    print(pos, status)
+    names = get_name()
+    if name in names:
+        pos = get_info(name)[name]["location"]
+        status = get_info(name)[name]["status"]
+    return render_template("actions.html", names=names, pos=pos, status=status)
 
 
 if __name__ == '__main__':

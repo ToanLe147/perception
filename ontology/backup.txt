@@ -1,18 +1,39 @@
-<body bgcolor="#faebd7">
+<!-- Fake detection -->
+<div class="container">
+    <form class="input-group mb-3" method="POST" action="/query">
+        <input name="inputQuery" type="text" class="form-control" placeholder="Query">
+        <input class="btn btn-primary" type="submit" value="Query">
+    </form>
 
-<h1><img src="{{url_for('static', filename='logo-fi-purple-small.png')}}" alt="Tampere University Logo" style="width:700px;height:232.33px;"></h1>
-<h1>Perception System for Robot Manipulator</h1>
-<h1>WEB USER INTERFACE</h1>
+    <form class="input-group mb-3" method="POST" action="/update">
+        <input name="detectedObject" type="text" class="form-control" placeholder="Detected Object">
+        <input name="btn_object" class="btn btn-success" type="submit" value="Update">
+        <button name="btn_object" value="Delete" type="submit" class="btn btn-danger">Delete</button>
+    </form>
+</div>
 
-<h1 class="topic">SERVICE:</h1> <h2 id="service"></h2>
+<!-- Observe the environment -->
+<form method="POST" action="/observe">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="mx-auto">
+              <button class="btn btn-primary">Detect</button>
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <ul class="list-group">
+                {% for name in names %}
+                    <a href="#" class="list-group-item list-group-item-success">
+                        <input type="hidden" name="handles[]" value="{{ name }}"/> {{ name }}
+                    </a>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</form>
 
-<h1 class="topic">S1000 REAL TIME:</h1> <h2 id="realTime"></h2>
-
-<h1 class="topic">RECEIVED EVENTS:</h1> <h2 id="received_event"></h2>
-
-<h1 class="topic" id="LED">LED OUTPUT:</h1>
 
 
-</body>
+
 
 PREFIX brainstorm: <http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX owl: <http://www.w3.org/2002/07/owl#> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX br: <http://vocab.deri.ie/br#> SELECT ?x ?y ?z ?status WHERE {brainstorm:bottle_location brainstorm:x ?x. brainstorm:bottle_location brainstorm:y ?y. brainstorm:bottle_location brainstorm:z ?z. brainstorm:bottle_status brainstorm:pickable ?status.}

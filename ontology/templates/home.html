@@ -4,63 +4,73 @@
     <title>Web User Interface</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <meta name="author" content="Toan Le">
+    <meta name="description" content="User Interface for Perception System project">
+
+    <script src="{{url_for('static', filename='jquery/jquery.js')}}"></script>
+
+    <!-- Bootstrap core CSS -->
     <link href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}" rel="stylesheet"></link>
+
+    <!-- Custom styles for Sidebar -->
+    <link href="{{url_for('static', filename='bootstrap/css/simple-sidebar.css')}}" rel="stylesheet"></link>
+
+    <!-- CSS for Glyphicons -->
     <link rel="stylesheet" href="{{url_for('static', filename='font-awesome/css/font-awesome.min.css')}}">
+
+    <!-- CSS for Glyphicons -->
     <link href="{{url_for('static', filename='icon/perception.png')}}" rel="shortcut icon"></link>
 
 </head>
 
 <body>
+    <!-- Top LOGO -->
     <div class="jumbotron text-center" style="margin-bottom:0">
-        <img src="{{url_for('static', filename='logo-fi-purple-small.png')}}" alt="Tampere University Logo" style="max-width:400px; margin-top:-7px">
+        <a href="http://localhost:8080"><img src="{{url_for('static', filename='logo-fi-purple-small.png')}}" alt="Tampere University Logo" style="max-width:400px; margin-top:-7px"></a>
     </div>
 
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </nav>
-
-    <h1 class="text-center">Perception System for Robot Manipulator</h1>
-
-    <div class="container">
-        <form class="input-group mb-3" method="POST" action="/query">
-            <input name="inputQuery" type="text" class="form-control" placeholder="Query">
-            <input class="btn btn-primary" type="submit" value="Query">
-        </form>
-
-        <form class="input-group mb-3" method="POST" action="/update">
-            <input name="detectedObject" type="text" class="form-control" placeholder="Detected Object">
-            <input name="btn_object" class="btn btn-success" type="submit" value="Update">
-            <button name="btn_object" value="Delete" type="submit" class="btn btn-danger">Delete</button>
-        </form>
-    </div>
-
-    <h1 class="bg-dark text-white">Get list of Objects</h1>
-
-    <form method="POST" action="/">
-        <div class="row">
-            <div class="col-sm-4">
-                <button class="btn btn-primary">Detect</button>
-            </div>
-            <div class="col-sm-8">
-                <ul class="list-group">
-                    {% for name in names %}
-                        <a href="#" class="list-group-item list-group-item-success">
-                            <input type="hidden" name="handles[]" value="{{ name }}"/> {{ name }}
-                        </a>
-                    {% endfor %}
-                </ul>
+    <!-- Main content -->
+    <div class="d-flex bg-secondary" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading bg-dark text-white font-weight-bold">Dashboard</div>
+            <div class="list-group list-group-flush">
+                <a href="/" class="list-group-item list-group-item-action bg-dark text-white">Home</a>
+                <a href="/perception" class="list-group-item list-group-item-action bg-dark text-white">Knowleadge Base</a>
+                <a href="/visual" class="list-group-item list-group-item-action bg-dark text-white">Visual</a>
             </div>
         </div>
-    </form>
+        <!-- /#sidebar-wrapper -->
 
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom mb-3">
+              <button class="btn btn-dark" id="menu-toggle"><span class="fa fa-bars"></span></button>
+            </nav>
+
+            {% block body %}{% endblock %}
+
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+
+    <!-- Bottom Logo -->
     <div class="jumbotron text-center" style="margin-bottom:0">
       <p>Footer</p>
     </div>
-
 </body>
+
+<!-- Bootstrap core JavaScript -->
+<script src="{{url_for('static', filename='jquery/jquery.min.js')}}"></script>
+<script src="{{url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+
+<!-- Menu Toggle Script -->
+<script>
+  $("#menu-toggle").click(function(e) {
+    e.preventDefault();
+    $("#wrapper").toggleClass("toggled");
+  });
+</script>
 
 </html>

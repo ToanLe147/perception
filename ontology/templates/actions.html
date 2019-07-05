@@ -1,0 +1,73 @@
+{% extends "home.html" %}
+
+{% block body %}
+
+<form class="input-group" method="POST" action="/perception/actions">
+    <div class="container mb-4">
+        <input name="detectedObject" type="text" class="form-control mb-1" placeholder="Detected Object">
+        <input name="btn_object" class="btn btn-success" type="submit" value="Update">
+        <button name="btn_object" value="Delete" type="submit" class="btn btn-danger">Delete</button>
+    </div>
+
+    <div class="container">
+        <div class="row mb-4">
+            <!-- Actions collume -->
+            <div class="col-sm-4">
+                <div class="d-flex justify-content-center bg-dark text-white font-weight-bold mb-3 border border-light">Actions</div>
+                <div class="d-flex justify-content-left mb-3">
+                  <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Observe">Observe</button>
+                </div>
+                <div class="d-flex justify-content-left mb-3">
+                  <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Pick">Pick</button>
+                </div>
+                <div class="d-flex justify-content-left mb-3">
+                  <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Place">Place</button>
+                </div>
+            </div>
+
+            <!-- Objects collume -->
+            <div class="col-sm-4">
+                <div class="d-flex justify-content-center bg-dark text-white font-weight-bold mb-3 border border-light">Objects</div>
+                <ul class="list-group">
+                    {% for name in names %}
+                        <a href="/perception/actions/{{ name }}" class="list-group-item list-group-item-success">
+                            <input type="hidden" name="handles[]" value="{{ name }}"/> {{ name }}
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Position collume -->
+            <div class="col-sm-4">
+                <div class="d-flex justify-content-center bg-dark text-white font-weight-bold mb-3 border border-light">Center Position</div>
+                <ul class="list-group">
+                    {% if pos %}
+                    <li class="list-group-item list-group-item-danger">
+                        <input type="hidden" name="pos[]" value="{{ pos[0] }}"/> {{ pos[0] }}
+                    </li>
+                    <li class="list-group-item list-group-item-danger">
+                        <input type="hidden" name="pos[]" value="{{ pos[1] }}"/> {{ pos[1] }}
+                    </li>
+                    <li class="list-group-item list-group-item-danger">
+                        <input type="hidden" name="pos[]" value="{{ pos[2] }}"/> {{ pos[2] }}
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="d-flex justify-content-center bg-dark text-white font-weight-bold mb-3 border border-light">Status</div>
+            <div class="jumbotron text-center" style="margin-bottom:0">
+                {% if status %}
+                <p class="lead">
+                    <input type="hidden" name="status[]" value="{{ status }}"/> {{ status }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</form>
+
+
+{% endblock %}

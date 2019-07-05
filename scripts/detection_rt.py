@@ -75,11 +75,10 @@ def load_image_into_numpy_array(image):
         (im_height, im_width, 3)).astype(np.uint8)
 
 
-def detection():
-    # Detection
-    with detection_graph.as_default():
-        with tf.Session(graph=detection_graph) as sess:
-
+# Detection
+with detection_graph.as_default():
+    with tf.Session(graph=detection_graph) as sess:
+        while True:
             # Read frame from camera
             ret, image_np = cap.read()
             # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
@@ -109,25 +108,20 @@ def detection():
                 use_normalized_coordinates=True,
                 line_thickness=8)
 
-            return image_np, boxes, classes, scores
+            # Display output
+            cv2.imshow('object detection', cv2.resize(image_np, (800, 600)))
 
+            # Print out results
+            for i, b in enumerate(boxes[0]):
+                # i: index, b: box
+                if scores[0][i] >= 0.5:
+                    # Crop depth data:
+                    object_class = category_index[int(classes[0][i])]['name']
+                    # print(depth_image)
+                    print("Detected a {0}.".format(object_class))
+                    pub.publish(object_class)
+                    rate.sleep()
 
-while True:
-    image_np, boxes, classes, scores = detection()
-    # Display output
-    cv2.imshow('object detection', cv2.resize(image_np, (800, 600)))
-
-    # Print out results
-    for i, b in enumerate(boxes[0]):
-        # i: index, b: box
-        if scores[0][i] >= 0.5:
-            # Crop depth data:
-            object_class = category_index[int(classes[0][i])]['name']
-            # print(depth_image)
-            print("Detected a {0}.".format(object_class))
-            pub.publish(object_class)
-            rate.sleep()
-
-    if cv2.waitKey(25) & 0xFF == ord('q'):
-        cv2.destroyAllWindows()
-        break
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                break
