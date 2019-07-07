@@ -5,20 +5,18 @@ import json
 import pygal
 from pygal.style import DarkStyle
 from flask import Flask, request, render_template
-import roslibpy
+import rospy
+from std_msgs.msg import String
+import os
+import threading
 
 
 # Flask
 app = Flask(__name__)
-client = roslibpy.Ros(host='localhost', port=9090)
-client.run()
+threading.Thread(target=lambda: rospy.init_node('web_ui', anonymous=True, disable_signals=True)).start()
+# rospy.init_node('web_ui', anonymous=True)
+pub = rospy.Publisher('chatter', String, queue_size=10)
 
-talker = roslibpy.Topic(client, '/chatter', 'std_msgs/String')
-talker.advertise()
-listener = roslibpy.Topic(client, '/objects_detected', 'std_msgs/String')
-listener.advertise()
-
-detected_objects = []
 ontology_server = 'http://localhost:3030/Testing/'
 header = {'content-type': 'application/x-www-form-urlencoded'}
 prefix = ('PREFIX brainstorm:<http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#> '
@@ -29,40 +27,40 @@ prefix = ('PREFIX brainstorm:<http://www.semanticweb.org/led/ontologies/2019/4/b
 
 
 def callback(msg):
-    global detected_objects
-    detected_objects.append(msg['data'])
+    detected_object = msg.data
+    update_ontology(detected_object, "INSERT")
+    print("Updated")
 
 
-listener.subscribe(callback)
+rospy.Subscriber("objects_detected", String, callback)
 
 
-def update_ontology(objects, type):
-    for detected_object in objects:
-        # type is DELETE or INSERT
-        name, raw_string = detected_object.split("/")
-        location = raw_string.split(" ")
-        # Prepair message
-        insert = (' Data { '
-                  + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
-                  + 'brainstorm:informations ; '
-                  + 'brainstorm:pickable "1"^^xsd:int; '
-                  + 'brainstorm:placeable "0"^^xsd:int. '
+def update_ontology(detected_object, type):
+    # type is DELETE or INSERT
+    name, raw_string = detected_object.split("/")
+    location = raw_string.split(" ")
+    # Prepair message
+    insert = (' Data { '
+              + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
+              + 'brainstorm:informations ; '
+              + 'brainstorm:pickable "1"^^xsd:int; '
+              + 'brainstorm:placeable "0"^^xsd:int. '
 
-                  + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
-                  + 'brainstorm:informations ; '
-                  + 'brainstorm:x {}; '.format(location[0])
-                  + 'brainstorm:y {}; '.format(location[1])
-                  + 'brainstorm:z {}. '.format(location[2])
+              + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
+              + 'brainstorm:informations ; '
+              + 'brainstorm:x {}; '.format(location[0])
+              + 'brainstorm:y {}; '.format(location[1])
+              + 'brainstorm:z {}. '.format(location[2])
 
-                  + 'brainstorm:{} a owl:NamedIndividual , brainstorm:objects ;'.format(name)
-                  + ' brainstorm:hasLocation brainstorm:{}_location; '.format(name)
-                  + 'brainstorm:hasStatus brainstorm:{}_status.'.format(name)
-                  + '}'
-                  )
-        # send POST request to server
-        msg = {'update': prefix + type + insert}
-        requests.post(url=ontology_server+'update', headers=header, data=msg)
-    return True
+              + 'brainstorm:{} a owl:NamedIndividual , brainstorm:objects ;'.format(name)
+              + ' brainstorm:hasLocation brainstorm:{}_location; '.format(name)
+              + 'brainstorm:hasStatus brainstorm:{}_status.'.format(name)
+              + '}'
+              )
+    # send POST request to server
+    msg = {'update': prefix + type + insert}
+    requests.post(url=ontology_server+'update', headers=header, data=msg)
+    print("Updated Ontology")
 
 
 def get_info(name):
@@ -125,30 +123,24 @@ def move_to_visual():
 
 @app.route("/perception/actions", methods=['POST'])
 def actions():
-    global detected_objects
     btn = request.form['btn_object']
-    # update = request.form['detectedObject']
+    update = request.form['detectedObject']
     names = request.form.getlist('handles[]')
+    object_list = get_name()
 
     if btn == "Observe":
-        talker.publish(roslibpy.Message({'data': 'ok'}))
-        if len(detected_objects) != 0:
-            print(detected_objects)
-            updated = update_ontology(detected_objects, "INSERT")
-            if updated:
-                object_list = get_name()
-            if not names:
-                names = object_list
-                detected_objects = []
+        pub.publish("ok")
+        if not names:
+            names = object_list
 
-    # if update:
-    #     if btn == "Update":
-    #         update_ontology(update, "INSERT")
-    #         names = []
-    #
-    #     if btn == "Delete":
-    #         update_ontology(update, "DELETE")
-    #         names = []
+    if update:
+        if btn == "Update":
+            update_ontology(update, "INSERT")
+            names = []
+
+        if btn == "Delete":
+            update_ontology(update, "DELETE")
+            names = []
 
     return render_template("actions.html", names=names)
 
@@ -157,6 +149,7 @@ def actions():
 def show_pos(name):
     pos = request.form.getlist('pos[]')
     status = request.form.getlist('status[]')
+    print(pos, status)
     names = get_name()
     if name in names:
         pos = get_info(name)[name]["location"]
@@ -165,4 +158,5 @@ def show_pos(name):
 
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=8080, debug="true")
+    app.run(host=os.environ['ROS_IP'], port=8080, debug="true")
+    # app.run(host="localhost", port=8080, debug="true")

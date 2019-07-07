@@ -1,25 +1,22 @@
 #!/usr/bin/env python
-
-# This script can detect object then the distance between object and camera.
-
-# import system dependencies
 import numpy as np
 import rospy
 from std_msgs.msg import String
 import os
-import pathmagic
-import pyrealsense2 as rs
-
-# import image processing libs
 import tensorflow as tf
 import cv2
+import pathmagic
 
-# import from object detection libs
+# from collections import defaultdict
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
+# ROS communication
+rospy.init_node('detection_rt')
+pub = rospy.Publisher('objects_detected', String, queue_size=10)
+rate = rospy.Rate(10)
 
-user_command = ''
+user_command = ""
 
 
 def callback(msg):
@@ -27,25 +24,14 @@ def callback(msg):
     user_command = msg.data
 
 
-# ROS communication
-rospy.init_node('testing_detection')
-pub = rospy.Publisher('objects_detected', String, queue_size=10)
 rospy.Subscriber("chatter", String, callback)
-rate = rospy.Rate(10)
 
-# Configure depth and color streams from Realsense
-pipeline = rs.pipeline()
-config = rs.config()
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 
-# Pointcloud persistency in case of dropped frames
-pc = rs.pointcloud()
-points = rs.points()
+# Define the video stream
+cap = cv2.VideoCapture(0)  # Change only if you have more than one webcams
 
-# Start streaming
-profile = pipeline.start(config)
-
+# What model to download.
+# Models can be found here: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
 # Model for detection
 MODEL_NAME = '/home/led/catkin_ws/src/robot_vision/src/ssd_mobilenet_v1_coco_2017_11_17'
 
@@ -74,41 +60,22 @@ categories = label_map_util.convert_label_map_to_categories(
     label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
+# Loading test images
+PATH_TO_TEST_IMAGES_DIR = '/home/led/catkin_ws/src/robot_vision/src/models/research/object_detection/test_images'
+TEST_IMAGE_PATHS = [os.path.join(PATH_TO_TEST_IMAGES_DIR, 'scene_{}.jpg'.format(i)) for i in range(1, 6)]
+
 
 # Detection
 with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
         while True:
-            # Read from Realsense and wait for a coherent pair of frames: depth and color
-            frames = pipeline.wait_for_frames()
-            # Align color images and depth images
-            align = rs.align(rs.stream.color)
-            aligned_frames = align.process(frames)
+            # for image in TEST_IMAGE_PATHS:
+            # image = TEST_IMAGE_PATHS[1]
 
-            depth_frame = aligned_frames.get_depth_frame()
-            color_frame = aligned_frames.get_color_frame()
-            if not depth_frame or not color_frame:
-                continue
-
-            # Tell pointcloud object to map to this color frame
-            pc.map_to(color_frame)
-
-            # Generate the pointcloud and texture mappings
-            # points = pc.calculate(depth_frame)
-
-            # Crop depth data:
-            depth_scale = profile.get_device().first_depth_sensor().get_depth_scale()
-            # Get camera intrinsics
-            depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
-
-            # Convert images to numpy arrays
-            depth_image = np.asanyarray(depth_frame.get_data()) * depth_scale
-            image_np = np.asanyarray(color_frame.get_data())
-            # print(image_np.shape)
-
-            # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
-            colorizer = rs.colorizer()
-            depth_colormap = np.asanyarray(colorizer.colorize(depth_frame).get_data())
+            # Read frame from camera
+            ret, image_np = cap.read()
+            # image = cv2.imread(TEST_IMAGE_PATHS[4])
+            # image_np = cv2.resize(image, (800, 800))
             # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
             image_np_expanded = np.expand_dims(image_np, axis=0)
             # Extract image tensor
@@ -122,28 +89,11 @@ with detection_graph.as_default():
             # Extract number of detectionsd
             num_detections = detection_graph.get_tensor_by_name(
                 'num_detections:0')
-
             # Actual detection.
             (boxes, scores, classes, num_detections) = sess.run(
                 [boxes, scores, classes, num_detections],
                 feed_dict={image_tensor: image_np_expanded})
-
-            # Get data scale from the device and convert to meters
-            height, width = image_np.shape[:2]
-
-            for i, b in enumerate(boxes[0]):
-                # i: index, b: box [ymin, xmin, ymax, xmax]
-                if scores[0][i] >= 0.5:
-                    # depth_image has size [480, 640]
-                    mid_y = min(int((b[0]+b[2])*height*0.5), 480)
-                    mid_x = min(int((b[1]+b[3])*width*0.5), 640)
-
-                    # Calculate x, y, z in world coordinates
-                    depth_point = rs.rs2_deproject_pixel_to_point(depth_intrin, [mid_y, mid_x], depth_image[mid_y, mid_x])
-
-                    object_class = category_index[int(classes[0][i])]['name']
-
-            # Visualization of the results of a detection on color image.
+            # Visualization of the results of a detection.
             vis_util.visualize_boxes_and_labels_on_image_array(
                 image_np,
                 np.squeeze(boxes),
@@ -153,28 +103,28 @@ with detection_graph.as_default():
                 use_normalized_coordinates=True,
                 line_thickness=8)
 
-            # Visualization of the results of a detection on depth image.
-            # vis_util.visualize_boxes_and_labels_on_image_array(
-            #     depth_colormap,
-            #     np.squeeze(boxes),
-            #     np.squeeze(classes).astype(np.int32),
-            #     np.squeeze(scores),
-            #     category_index,
-            #     use_normalized_coordinates=True,
-            #     line_thickness=8)
+            # Print out results
 
-            if user_command == 'ok':
-                # print(depth_image)
-                print("Detected a {0} {1} meters away.".format(object_class, depth_point[2]))
-                pub.publish("{0}/{1:.2} {2:.2} {3:.2}".format(object_class, depth_point[0], depth_point[1], depth_point[2]))
+            if user_command == "ok":
+                for i, b in enumerate(boxes[0]):
+                    # i: index, b: box
+                    if scores[0][i] >= 0.5:
+                        x = (b[1] + b[3])/2
+                        y = (b[0] + b[2])/2
+                        # Crop depth data:
+                        object_class = category_index[int(classes[0][i])]['name']
+                        if " " in object_class:
+                            object_class = object_class.replace(" ", "_")
+                        data = "{0}/{1:.1} {2:.1} 0.1".format(object_class, x, y)
 
-            # Stack both images horizontally
-            images = np.hstack((image_np, depth_colormap))
+                        pub.publish(data)
+                        print("Detected a {0} with center {1:.1} {2:.1}.".format(object_class, x, y))
+                        rate.sleep()
+                user_command = ""
 
             # Display output
-            cv2.imshow('object detection', images)
+            cv2.imshow('object detection', cv2.resize(image_np, (800, 800)))
 
-            # Press q to quit
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 break
