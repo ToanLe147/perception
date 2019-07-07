@@ -5,17 +5,10 @@ import json
 import pygal
 from pygal.style import DarkStyle
 from flask import Flask, request, render_template
-import rospy
-from std_msgs.msg import String
-import os
-import threading
 
 
 # Flask
 app = Flask(__name__)
-threading.Thread(target=lambda: rospy.init_node('web_ui', anonymous=True, disable_signals=True)).start()
-# rospy.init_node('web_ui', anonymous=True)
-pub = rospy.Publisher('chatter', String, queue_size=10)
 
 ontology_server = 'http://localhost:3030/Testing/'
 header = {'content-type': 'application/x-www-form-urlencoded'}
@@ -24,15 +17,6 @@ prefix = ('PREFIX brainstorm:<http://www.semanticweb.org/led/ontologies/2019/4/b
           + 'PREFIX owl: <http://www.w3.org/2002/07/owl#> '
           + 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> '
           + 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> ')
-
-
-def callback(msg):
-    detected_object = msg.data
-    update_ontology(detected_object, "INSERT")
-    print("Updated")
-
-
-rospy.Subscriber("objects_detected", String, callback)
 
 
 def update_ontology(detected_object, type):
@@ -129,7 +113,6 @@ def actions():
     object_list = get_name()
 
     if btn == "Observe":
-        pub.publish("ok")
         if not names:
             names = object_list
 

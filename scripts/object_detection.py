@@ -20,7 +20,7 @@ from object_detection.utils import visualization_utils as vis_util
 
 # ROS communication
 pub = rospy.Publisher('objects_detected', String, queue_size=10)
-rospy.init_node('testing_detection')
+rospy.init_node('object_detection')
 rate = rospy.Rate(10)
 
 # Define the video stream

@@ -14,6 +14,8 @@ client = roslibpy.Ros(host='localhost', port=9090)
 client.run()
 
 talker = roslibpy.Topic(client, '/chatter', 'std_msgs/String')
+ur5_move = roslibpy.Topic(client, '/hololens', 'geometry_msgs/Pose')
+ur5_move.advertise()
 talker.advertise()
 listener = roslibpy.Topic(client, '/objects_detected', 'std_msgs/String')
 listener.advertise()
@@ -132,14 +134,18 @@ def actions():
 
     if btn == "Observe":
         talker.publish(roslibpy.Message({'data': 'ok'}))
+        ur5_move.publish(roslibpy.Message({"position": {"x": 0.2, "y": 0.1, "z": 0.5}}))
         if len(detected_objects) != 0:
             print(detected_objects)
             updated = update_ontology(detected_objects, "INSERT")
-            if updated:
-                object_list = get_name()
-            if not names:
-                names = object_list
-                detected_objects = []
+        # if updated:
+        object_list = get_name()
+        if not names:
+            names = object_list
+            detected_objects = []
+
+    if btn == "Pick":
+        ur5_move.publish(roslibpy.Message({"position": {"x": 0.5, "y": 0.4, "z": 0.2}}))
 
     # if update:
     #     if btn == "Update":
