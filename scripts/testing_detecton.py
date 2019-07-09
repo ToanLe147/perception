@@ -24,7 +24,7 @@ def callback(msg):
     user_command = msg.data
 
 
-rospy.Subscriber("chatter", String, callback)
+rospy.Subscriber("observe_table", String, callback)
 
 
 # Define the video stream
@@ -65,47 +65,48 @@ PATH_TO_TEST_IMAGES_DIR = '/home/led/catkin_ws/src/robot_vision/src/models/resea
 TEST_IMAGE_PATHS = [os.path.join(PATH_TO_TEST_IMAGES_DIR, 'scene_{}.jpg'.format(i)) for i in range(1, 6)]
 
 
-# Detection
-with detection_graph.as_default():
-    with tf.Session(graph=detection_graph) as sess:
-        while True:
-            # for image in TEST_IMAGE_PATHS:
-            # image = TEST_IMAGE_PATHS[1]
+while not rospy.is_shutdown():
+    # Detection
+    if user_command == "ok":
+        with detection_graph.as_default():
+            with tf.Session(graph=detection_graph) as sess:
+            # while True:
+                # for image in TEST_IMAGE_PATHS:
+                # image = TEST_IMAGE_PATHS[1]
 
-            # Read frame from camera
-            ret, image_np = cap.read()
-            # image = cv2.imread(TEST_IMAGE_PATHS[4])
-            # image_np = cv2.resize(image, (800, 800))
-            # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-            image_np_expanded = np.expand_dims(image_np, axis=0)
-            # Extract image tensor
-            image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-            # Extract detection boxes
-            boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-            # Extract detection scores
-            scores = detection_graph.get_tensor_by_name('detection_scores:0')
-            # Extract detection classes
-            classes = detection_graph.get_tensor_by_name('detection_classes:0')
-            # Extract number of detectionsd
-            num_detections = detection_graph.get_tensor_by_name(
-                'num_detections:0')
-            # Actual detection.
-            (boxes, scores, classes, num_detections) = sess.run(
-                [boxes, scores, classes, num_detections],
-                feed_dict={image_tensor: image_np_expanded})
-            # Visualization of the results of a detection.
-            vis_util.visualize_boxes_and_labels_on_image_array(
-                image_np,
-                np.squeeze(boxes),
-                np.squeeze(classes).astype(np.int32),
-                np.squeeze(scores),
-                category_index,
-                use_normalized_coordinates=True,
-                line_thickness=8)
+                # Read frame from camera
+                ret, image_np = cap.read()
+                # image = cv2.imread(TEST_IMAGE_PATHS[4])
+                # image_np = cv2.resize(image, (800, 800))
+                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+                image_np_expanded = np.expand_dims(image_np, axis=0)
+                # Extract image tensor
+                image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+                # Extract detection boxes
+                boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+                # Extract detection scores
+                scores = detection_graph.get_tensor_by_name('detection_scores:0')
+                # Extract detection classes
+                classes = detection_graph.get_tensor_by_name('detection_classes:0')
+                # Extract number of detectionsd
+                num_detections = detection_graph.get_tensor_by_name(
+                    'num_detections:0')
+                # Actual detection.
+                (boxes, scores, classes, num_detections) = sess.run(
+                    [boxes, scores, classes, num_detections],
+                    feed_dict={image_tensor: image_np_expanded})
+                # Visualization of the results of a detection.
+                vis_util.visualize_boxes_and_labels_on_image_array(
+                    image_np,
+                    np.squeeze(boxes),
+                    np.squeeze(classes).astype(np.int32),
+                    np.squeeze(scores),
+                    category_index,
+                    use_normalized_coordinates=True,
+                    line_thickness=8)
 
-            # Print out results
+                # Print out results
 
-            if user_command == "ok":
                 for i, b in enumerate(boxes[0]):
                     # i: index, b: box
                     if scores[0][i] >= 0.5:
@@ -122,9 +123,9 @@ with detection_graph.as_default():
                         rate.sleep()
                 user_command = ""
 
-            # Display output
-            cv2.imshow('object detection', cv2.resize(image_np, (800, 800)))
+                # Display output
+                cv2.imshow('object detection', cv2.resize(image_np, (800, 800)))
 
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                cv2.destroyAllWindows()
-                break
+                if cv2.waitKey(25) & 0xFF == ord('q'):
+                    cv2.destroyAllWindows()
+                    # break

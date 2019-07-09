@@ -1,84 +1,37 @@
 #!/usr/bin/env python
 
-import requests
-import json
 import pygal
 from pygal.style import DarkStyle
 from flask import Flask, request, render_template
+import roslibpy
+# import pathmagic
+
+# Test
+from ontology_manager import ontology
+# from views import visual, perception
 
 
+db = ontology()
+detected_objects = []
 # Flask
 app = Flask(__name__)
+client = roslibpy.Ros(host='localhost', port=9090)
+client.run()
 
-ontology_server = 'http://localhost:3030/Testing/'
-header = {'content-type': 'application/x-www-form-urlencoded'}
-prefix = ('PREFIX brainstorm:<http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#> '
-          + 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> '
-          + 'PREFIX owl: <http://www.w3.org/2002/07/owl#> '
-          + 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> '
-          + 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> ')
-
-
-def update_ontology(detected_object, type):
-    # type is DELETE or INSERT
-    name, raw_string = detected_object.split("/")
-    location = raw_string.split(" ")
-    # Prepair message
-    insert = (' Data { '
-              + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
-              + 'brainstorm:informations ; '
-              + 'brainstorm:pickable "1"^^xsd:int; '
-              + 'brainstorm:placeable "0"^^xsd:int. '
-
-              + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
-              + 'brainstorm:informations ; '
-              + 'brainstorm:x {}; '.format(location[0])
-              + 'brainstorm:y {}; '.format(location[1])
-              + 'brainstorm:z {}. '.format(location[2])
-
-              + 'brainstorm:{} a owl:NamedIndividual , brainstorm:objects ;'.format(name)
-              + ' brainstorm:hasLocation brainstorm:{}_location; '.format(name)
-              + 'brainstorm:hasStatus brainstorm:{}_status.'.format(name)
-              + '}'
-              )
-    # send POST request to server
-    msg = {'update': prefix + type + insert}
-    requests.post(url=ontology_server+'update', headers=header, data=msg)
-    print("Updated Ontology")
+talker = roslibpy.Topic(client, '/observe_table', 'std_msgs/String')
+ur5_move = roslibpy.Topic(client, '/UR5_command', 'geometry_msgs/Pose')
+ur5_move.advertise()
+talker.advertise()
+listener = roslibpy.Topic(client, '/objects_detected', 'std_msgs/String')
+listener.advertise()
 
 
-def get_info(name):
-    query = ("SELECT ?x ?y ?z ?status " +
-             "WHERE { " +
-             "brainstorm:{}_location brainstorm:x ?x. ".format(name) +
-             "brainstorm:{}_location brainstorm:y ?y. ".format(name) +
-             "brainstorm:{}_location brainstorm:z ?z. ".format(name) +
-             "brainstorm:{}_status brainstorm:pickable ?status.".format(name) +
-             "}")
-    # send POST request to server
-    msg = {'query': prefix + query}
-    r = requests.post(url=ontology_server+'query', headers=header, data=msg)
-    # Handle response as json type
-    res = json.loads(r.content)
-    location = [
-        float(res["results"]["bindings"][0]["x"]["value"]),
-        float(res["results"]["bindings"][0]["y"]["value"]),
-        float(res["results"]["bindings"][0]["z"]["value"])]
-    status = float(res["results"]["bindings"][0]["status"]["value"])
-    return {name: {"location": location, "status": status}}
+def callback(msg):
+    global detected_objects
+    detected_objects.append(msg['data'])
 
 
-def get_name():
-    object_list = []
-    query = ("SELECT ?name " +
-             "WHERE {?name a  owl:NamedIndividual , brainstorm:objects .}")
-    msg = {'query': prefix + query}
-    r = requests.post(url=ontology_server+'query', headers=header, data=msg)
-    res = json.loads(r.content)
-    for i in res["results"]["bindings"]:
-        _, name = i["name"]["value"].split("#")
-        object_list.append(name)
-    return object_list
+listener.subscribe(callback)
 
 
 @app.route("/")
@@ -93,12 +46,12 @@ def move_to_knowleadge_base():
 
 @app.route("/visual")
 def move_to_visual():
-    names = get_name()
+    names = db.get_name()
     graph = pygal.XY(stroke=False, style=DarkStyle)
     graph.title = 'Object Position'
 
     for name in names:
-        x, y, _ = get_info(name)[name]["location"]
+        x, y, _ = db.get_info(name)[name]["location"]
         graph.add(name, [{'value': (x, y), 'node': {'r': 6}}])
 
     graph_data = graph.render_data_uri()
@@ -107,22 +60,33 @@ def move_to_visual():
 
 @app.route("/perception/actions", methods=['POST'])
 def actions():
+    global detected_objects
     btn = request.form['btn_object']
-    update = request.form['detectedObject']
+    update = [request.form['detectedObject']]
     names = request.form.getlist('handles[]')
-    object_list = get_name()
 
     if btn == "Observe":
+        talker.publish(roslibpy.Message({'data': 'ok'}))
+        ur5_move.publish(roslibpy.Message({"position": {"x": 0.2, "y": 0.1, "z": 0.5}}))
+        if len(detected_objects) != 0:
+            print(detected_objects)
+            updated = db.update_ontology(detected_objects, "INSERT")
+        # if updated:
+        object_list = db.get_name()
         if not names:
             names = object_list
+            detected_objects = []
+
+    if btn == "Pick":
+        ur5_move.publish(roslibpy.Message({"position": {"x": 0.5, "y": 0.4, "z": 0.2}}))
 
     if update:
         if btn == "Update":
-            update_ontology(update, "INSERT")
+            db.update_ontology(update, "INSERT")
             names = []
 
         if btn == "Delete":
-            update_ontology(update, "DELETE")
+            db.update_ontology(update, "DELETE")
             names = []
 
     return render_template("actions.html", names=names)
@@ -132,14 +96,12 @@ def actions():
 def show_pos(name):
     pos = request.form.getlist('pos[]')
     status = request.form.getlist('status[]')
-    print(pos, status)
-    names = get_name()
+    names = db.get_name()
     if name in names:
-        pos = get_info(name)[name]["location"]
-        status = get_info(name)[name]["status"]
+        pos = db.get_info(name)[name]["location"]
+        status = db.get_info(name)[name]["status"]
     return render_template("actions.html", names=names, pos=pos, status=status)
 
 
 if __name__ == '__main__':
-    app.run(host=os.environ['ROS_IP'], port=8080, debug="true")
-    # app.run(host="localhost", port=8080, debug="true")
+    app.run(host="localhost", port=8080, debug="true")
