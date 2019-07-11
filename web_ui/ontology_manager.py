@@ -9,37 +9,39 @@ class ontology():
         self.ontology_server = 'http://localhost:3030/Testing/'
         self.header = {'content-type': 'application/x-www-form-urlencoded'}
         self.prefix = ('PREFIX brainstorm:<http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#> '
-                  + 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> '
-                  + 'PREFIX owl: <http://www.w3.org/2002/07/owl#> '
-                  + 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> '
-                  + 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> ')
+                       + 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> '
+                       + 'PREFIX owl: <http://www.w3.org/2002/07/owl#> '
+                       + 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> '
+                       + 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> ')
 
     def update_ontology(self, objects, type):
         for detected_object in objects:
             # type is DELETE or INSERT
             name, raw_string = detected_object.split("/")
             location = raw_string.split(" ")
-            # Prepair message
-            insert = (' Data { '
-                      + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
-                      + 'brainstorm:informations ; '
-                      + 'brainstorm:pickable "1"^^xsd:int; '
-                      + 'brainstorm:placeable "0"^^xsd:int. '
+            if name not in self.detected_objects:
+                self.detected_objects.append(name)
+                # Prepair message
+                insert = (' Data { '
+                          + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
+                          + 'brainstorm:informations ; '
+                          + 'brainstorm:pickable "1"^^xsd:int; '
+                          + 'brainstorm:placeable "0"^^xsd:int. '
 
-                      + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
-                      + 'brainstorm:informations ; '
-                      + 'brainstorm:x {}; '.format(location[0])
-                      + 'brainstorm:y {}; '.format(location[1])
-                      + 'brainstorm:z {}. '.format(location[2])
+                          + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
+                          + 'brainstorm:informations ; '
+                          + 'brainstorm:x {}; '.format(location[0])
+                          + 'brainstorm:y {}; '.format(location[1])
+                          + 'brainstorm:z {}. '.format(location[2])
 
-                      + 'brainstorm:{} a owl:NamedIndividual , brainstorm:objects ;'.format(name)
-                      + ' brainstorm:hasLocation brainstorm:{}_location; '.format(name)
-                      + 'brainstorm:hasStatus brainstorm:{}_status.'.format(name)
-                      + '}'
-                      )
-            # send POST request to server
-            msg = {'update': self.prefix + type + insert}
-            requests.post(url=self.ontology_server+'update', headers=self.header, data=msg)
+                          + 'brainstorm:{} a owl:NamedIndividual , brainstorm:objects ;'.format(name)
+                          + ' brainstorm:hasLocation brainstorm:{}_location; '.format(name)
+                          + 'brainstorm:hasStatus brainstorm:{}_status.'.format(name)
+                          + '}'
+                          )
+                # send POST request to server
+                msg = {'update': self.prefix + type + insert}
+                requests.post(url=self.ontology_server+'update', headers=self.header, data=msg)
         return True
 
     def get_info(self, name):
@@ -63,7 +65,6 @@ class ontology():
         return {name: {"location": location, "status": status}}
 
     def get_name(self):
-        object_list = []
         query = ("SELECT ?name " +
                  "WHERE {?name a  owl:NamedIndividual , brainstorm:objects .}")
         msg = {'query': self.prefix + query}
@@ -71,5 +72,6 @@ class ontology():
         res = json.loads(r.content)
         for i in res["results"]["bindings"]:
             _, name = i["name"]["value"].split("#")
-            object_list.append(name)
-        return object_list
+            if name not in self.detected_objects:
+                self.detected_objects.append(name)
+        return self.detected_objects

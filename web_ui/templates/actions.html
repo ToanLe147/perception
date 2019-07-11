@@ -3,10 +3,15 @@
 {% block body %}
 
 <form class="input-group" method="POST" action="/perception/actions">
-    <div class="container mb-4">
+    <!-- <div class="container mb-4">
         <input name="detectedObject" type="text" class="form-control mb-1" placeholder="Detected Object">
         <input name="btn_object" class="btn btn-success" type="submit" value="Update">
         <button name="btn_object" value="Delete" type="submit" class="btn btn-danger">Delete</button>
+    </div> -->
+
+    <div class="container mb-4">
+        <!-- <img src="{{url_for('static', filename='images/observed_scene.jpg')}}"/> -->
+        <input name="btn_object" class="btn btn-success" type="submit" value="Observe">
     </div>
 
     <div class="container">
@@ -15,10 +20,10 @@
             <div class="col-sm-4">
                 <div class="d-flex justify-content-center bg-dark text-white font-weight-bold mb-3 border border-light">Actions</div>
                 <div class="d-flex justify-content-left mb-3">
-                  <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Observe">Observe</button>
+                  <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Update">Update</button>
                 </div>
                 <div class="d-flex justify-content-left mb-3">
-                  <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Pick">Pick</button>
+                    <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Pick">Pick</button>
                 </div>
                 <div class="d-flex justify-content-left mb-3">
                   <button name="btn_object" class="btn btn-primary btn-block" type="submit" value="Place">Place</button>

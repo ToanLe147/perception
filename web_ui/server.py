@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import pygal
 from pygal.style import DarkStyle
 from flask import Flask, request, render_template
@@ -28,10 +29,8 @@ listener.advertise()
 
 def callback(msg):
     global detected_objects
-    detected_objects.append(msg['data'])
-
-
-listener.subscribe(callback)
+    if msg['data'] not in detected_objects:
+        detected_objects.append(msg['data'])
 
 
 @app.route("/")
@@ -60,46 +59,38 @@ def move_to_visual():
 
 @app.route("/perception/actions", methods=['POST'])
 def actions():
+    listener.subscribe(callback)
     global detected_objects
     btn = request.form['btn_object']
-    update = [request.form['detectedObject']]
     names = request.form.getlist('handles[]')
 
     if btn == "Observe":
         talker.publish(roslibpy.Message({'data': 'ok'}))
-        ur5_move.publish(roslibpy.Message({"position": {"x": 0.2, "y": 0.1, "z": 0.5}}))
-        if len(detected_objects) != 0:
-            print(detected_objects)
-            updated = db.update_ontology(detected_objects, "INSERT")
-        # if updated:
-        object_list = db.get_name()
-        if not names:
-            names = object_list
-            detected_objects = []
+        print(detected_objects)
 
-    if btn == "Pick":
-        ur5_move.publish(roslibpy.Message({"position": {"x": 0.5, "y": 0.4, "z": 0.2}}))
+    # if btn == "Pick":
+    #     ur5_move.publish(roslibpy.Message({"position": {"x": 0.5, "y": 0.4, "z": 0.2}}))
 
-    if update:
-        if btn == "Update":
-            db.update_ontology(update, "INSERT")
-            names = []
-
-        if btn == "Delete":
-            db.update_ontology(update, "DELETE")
-            names = []
+    if btn == "Update":
+        print(detected_objects)
+        db.update_ontology(detected_objects, "INSERT")
+        names = db.get_name()
+        print(names)
 
     return render_template("actions.html", names=names)
 
 
-@app.route("/perception/actions/<name>", methods=['GET'])
+@app.route("/perception/actions/<name>", methods=['GET', 'POST'])
 def show_pos(name):
     pos = request.form.getlist('pos[]')
     status = request.form.getlist('status[]')
     names = db.get_name()
-    if name in names:
-        pos = db.get_info(name)[name]["location"]
-        status = db.get_info(name)[name]["status"]
+    pos = db.get_info(name)[name]["location"]
+    status = db.get_info(name)[name]["status"]
+    if request.method == 'POST':
+        btn = request.form['btn_object']
+        if btn == "Pick":
+            ur5_move.publish(roslibpy.Message({"position": {"x": pos[0], "y": pos[1], "z": pos[2]}}))
     return render_template("actions.html", names=names, pos=pos, status=status)
 
 

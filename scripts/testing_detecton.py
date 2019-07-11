@@ -12,9 +12,9 @@ from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 
 # ROS communication
-rospy.init_node('detection_rt')
+rospy.init_node('testing_detection')
 pub = rospy.Publisher('objects_detected', String, queue_size=10)
-rate = rospy.Rate(10)
+rate = rospy.Rate(20)
 
 user_command = ""
 
@@ -65,48 +65,51 @@ PATH_TO_TEST_IMAGES_DIR = '/home/led/catkin_ws/src/robot_vision/src/models/resea
 TEST_IMAGE_PATHS = [os.path.join(PATH_TO_TEST_IMAGES_DIR, 'scene_{}.jpg'.format(i)) for i in range(1, 6)]
 
 
-while not rospy.is_shutdown():
-    # Detection
-    if user_command == "ok":
-        with detection_graph.as_default():
-            with tf.Session(graph=detection_graph) as sess:
-            # while True:
-                # for image in TEST_IMAGE_PATHS:
-                # image = TEST_IMAGE_PATHS[1]
+# Detection
+with detection_graph.as_default():
+    with tf.Session(graph=detection_graph) as sess:
+        while True:
+            # for image in TEST_IMAGE_PATHS:
+            # image = TEST_IMAGE_PATHS[1]
 
-                # Read frame from camera
-                ret, image_np = cap.read()
-                # image = cv2.imread(TEST_IMAGE_PATHS[4])
-                # image_np = cv2.resize(image, (800, 800))
-                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-                image_np_expanded = np.expand_dims(image_np, axis=0)
-                # Extract image tensor
-                image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
-                # Extract detection boxes
-                boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
-                # Extract detection scores
-                scores = detection_graph.get_tensor_by_name('detection_scores:0')
-                # Extract detection classes
-                classes = detection_graph.get_tensor_by_name('detection_classes:0')
-                # Extract number of detectionsd
-                num_detections = detection_graph.get_tensor_by_name(
-                    'num_detections:0')
-                # Actual detection.
-                (boxes, scores, classes, num_detections) = sess.run(
-                    [boxes, scores, classes, num_detections],
-                    feed_dict={image_tensor: image_np_expanded})
-                # Visualization of the results of a detection.
-                vis_util.visualize_boxes_and_labels_on_image_array(
-                    image_np,
-                    np.squeeze(boxes),
-                    np.squeeze(classes).astype(np.int32),
-                    np.squeeze(scores),
-                    category_index,
-                    use_normalized_coordinates=True,
-                    line_thickness=8)
+            # Read frame from camera
+            ret, image_np = cap.read()
+            # image = cv2.imread(TEST_IMAGE_PATHS[4])
+            # image_np = cv2.resize(image, (450, 450))
+            # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+            image_np_expanded = np.expand_dims(image_np, axis=0)
+            # Extract image tensor
+            image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+            # Extract detection boxes
+            boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+            # Extract detection scores
+            scores = detection_graph.get_tensor_by_name('detection_scores:0')
+            # Extract detection classes
+            classes = detection_graph.get_tensor_by_name('detection_classes:0')
+            # Extract number of detectionsd
+            num_detections = detection_graph.get_tensor_by_name(
+                'num_detections:0')
+            # Actual detection.
+            (boxes, scores, classes, num_detections) = sess.run(
+                [boxes, scores, classes, num_detections],
+                feed_dict={image_tensor: image_np_expanded})
+            # Visualization of the results of a detection.
+            vis_util.visualize_boxes_and_labels_on_image_array(
+                image_np,
+                np.squeeze(boxes),
+                np.squeeze(classes).astype(np.int32),
+                np.squeeze(scores),
+                category_index,
+                use_normalized_coordinates=True,
+                line_thickness=8)
 
-                # Print out results
+            # Print out results
+            if user_command == "ok":
+                # Upload result image to web ui
+                path = '/home/led/catkin_ws/src/robot_vision/src/web_ui/static/images'
+                cv2.imwrite(os.path.join(path, 'observed_scene.jpg'), image_np)
 
+                # Update Ontology
                 for i, b in enumerate(boxes[0]):
                     # i: index, b: box
                     if scores[0][i] >= 0.5:
@@ -121,11 +124,12 @@ while not rospy.is_shutdown():
                         pub.publish(data)
                         print("Detected a {0} with center {1:.1} {2:.1}.".format(object_class, x, y))
                         rate.sleep()
+                # Reset
                 user_command = ""
 
-                # Display output
-                cv2.imshow('object detection', cv2.resize(image_np, (800, 800)))
+            # Display output
+            cv2.imshow('object detection', image_np)
 
-                if cv2.waitKey(25) & 0xFF == ord('q'):
-                    cv2.destroyAllWindows()
-                    # break
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                break
