@@ -46,6 +46,7 @@
         <div id="page-content-wrapper">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom mb-3">
               <button class="btn btn-dark" id="menu-toggle"><span class="fa fa-bars"></span></button>
+              <button onclick="goBack()" class="btn btn-dark"><span class="fa fa-backward"></span></button>
             </nav>
 
             {% block body %}{% endblock %}
@@ -71,6 +72,12 @@
     e.preventDefault();
     $("#wrapper").toggleClass("toggled");
   });
+</script>
+
+<script>
+function goBack() {
+  window.history.back();
+}
 </script>
 
 </html>

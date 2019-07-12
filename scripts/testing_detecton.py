@@ -73,9 +73,9 @@ with detection_graph.as_default():
             # image = TEST_IMAGE_PATHS[1]
 
             # Read frame from camera
-            # ret, image_np = cap.read()
-            image = cv2.imread(TEST_IMAGE_PATHS[4])
-            image_np = cv2.resize(image, (400, 400))
+            ret, image_np = cap.read()
+            # image = cv2.imread(TEST_IMAGE_PATHS[4])
+            # image_np = cv2.resize(image, (400, 400))
             # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
             image_np_expanded = np.expand_dims(image_np, axis=0)
             # Extract image tensor
