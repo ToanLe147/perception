@@ -14,6 +14,8 @@ from ontology_manager import ontology
 
 db = ontology()
 detected_objects = []
+path = 'images'
+
 # Flask
 app = Flask(__name__)
 client = roslibpy.Ros(host='localhost', port=9090)
@@ -30,6 +32,7 @@ listener.advertise()
 def callback(msg):
     global detected_objects
     if msg['data'] not in detected_objects:
+        db.update_ontology([msg['data']], "INSERT")
         detected_objects.append(msg['data'])
 
 
@@ -57,41 +60,59 @@ def move_to_visual():
     return render_template("visual.html", graph_data=graph_data)
 
 
-@app.route("/perception/actions", methods=['POST'])
+@app.route("/perception/knowleadge", methods=['POST'])
 def actions():
+
     listener.subscribe(callback)
     global detected_objects
     btn = request.form['btn_object']
     names = request.form.getlist('handles[]')
+    detection_image = os.path.join(path, 'observed_scene.jpg')
 
     if btn == "Observe":
         talker.publish(roslibpy.Message({'data': 'ok'}))
         print(detected_objects)
 
     # if btn == "Pick":
-    #     ur5_move.publish(roslibpy.Message({"position": {"x": 0.5, "y": 0.4, "z": 0.2}}))
+    #     ur5_move.publish(roslibpy.Message({"position": {"x": pos[0], "y": pos[1], "z": pos[2]}}))
 
     if btn == "Update":
-        print(detected_objects)
-        db.update_ontology(detected_objects, "INSERT")
+        # db.update_ontology(detected_objects, "INSERT")
         names = db.get_name()
-        print(names)
 
-    return render_template("actions.html", names=names)
+    return render_template("actions.html", names=names, detection_image=detection_image)
 
 
-@app.route("/perception/actions/<name>", methods=['GET', 'POST'])
+@app.route("/perception/knowleadge/<name>", methods=['GET'])
 def show_pos(name):
+    detection_image = os.path.join(path, 'observed_scene.jpg')
     pos = request.form.getlist('pos[]')
     status = request.form.getlist('status[]')
     names = db.get_name()
+    actions = ['pick', 'place']
     pos = db.get_info(name)[name]["location"]
     status = db.get_info(name)[name]["status"]
-    if request.method == 'POST':
-        btn = request.form['btn_object']
-        if btn == "Pick":
-            ur5_move.publish(roslibpy.Message({"position": {"x": pos[0], "y": pos[1], "z": pos[2]}}))
-    return render_template("actions.html", names=names, pos=pos, status=status)
+    return render_template("actions.html", names=names, pos=pos, status=status, detection_image=detection_image, actions=actions, selected_object=name)
+
+
+@app.route("/perception/knowleadge/<name>/<action>", methods=['GET'])
+def show_action(name, action):
+    detection_image = os.path.join(path, 'observed_scene.jpg')
+    pos = request.form.getlist('pos[]')
+    status = request.form.getlist('status[]')
+    names = db.get_name()
+    actions = ['pick', 'place']
+    pos = db.get_info(name)[name]["location"]
+    destination = [0.4, -0.5, 0.1]
+    status = db.get_info(name)[name]["status"]
+
+    if action == "pick":
+        ur5_move.publish(roslibpy.Message({"position": {"x": pos[0], "y": pos[1], "z": pos[2]}}))
+
+    if action == 'place':
+        ur5_move.publish(roslibpy.Message({"position": {"x": destination[0], "y": destination[1], "z": destination[2]}}))
+
+    return render_template("actions.html", names=names, pos=pos, status=status, detection_image=detection_image, actions=actions, selected_object=name)
 
 
 if __name__ == '__main__':
