@@ -62,6 +62,38 @@
     
 
 
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#DOWN -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#DOWN">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#LEFT -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#LEFT">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#RIGHT -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#RIGHT">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UP -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UP">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#busy -->
 
     <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#busy">
@@ -102,9 +134,41 @@
     
 
 
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#xmax -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#xmax">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#xmin -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#xmin">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#y -->
 
     <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#y">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#ymax -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#ymax">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#ymin -->
+
+    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#ymin">
         <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
     </owl:DatatypeProperty>
     
@@ -227,8 +291,10 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_status">
         <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
-        <pickable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</pickable>
-        <placeable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</placeable>
+        <xmax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</xmax>
+        <xmin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</xmin>
+        <ymax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</ymax>
+        <ymin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</ymin>
     </owl:NamedIndividual>
     
 

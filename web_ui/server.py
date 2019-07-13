@@ -58,9 +58,12 @@ def move_to_visual():
     graph.title = 'Object Position'
 
     for name in names:
-        x, y, _ = db.get_info(name)[name]["location"]
-        graph.add(name, [{'value': (x, y), 'node': {'r': 6}}])
-        # graph.add('Test', [(.1, .3), (.2, .3), (.2, .2), (.1, .2), (.1, .3)], stroke=True, fill=True)
+        if name == "object":
+            continue
+        xmin, ymin, xmax, ymax = db.get_info(name)[name]["status"]
+        # x, y, _ = db.get_info(name)[name]["location"]
+        # graph.add(name, [{'value': (x, y), 'node': {'r': 6}}])
+        graph.add(name, [None, (xmin, ymin), (xmin, ymax), (xmax, ymax), (xmax, ymin), (xmin, ymin), None], stroke=True, fill=True)
 
     graph_data = graph.render_data_uri()
     return render_template("visual.html", graph_data=graph_data)
@@ -100,7 +103,7 @@ def show_action(name, action):
     names = db.get_name()
     actions = ['pick', 'place']
     pos = db.get_info(name)[name]["location"]
-    destination = [0.4, -0.5, 0.1]
+    destination = [0.4, -0.5, 0.1]  # OPtional position
     status = db.get_info(name)[name]["status"]
 
     if action == "pick":

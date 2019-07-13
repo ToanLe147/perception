@@ -17,16 +17,19 @@ class ontology():
     def update_ontology(self, objects, type):
         for detected_object in objects:
             # type is DELETE or INSERT
-            name, raw_string = detected_object.split("/")
+            name, raw_string, corners = detected_object.split("/")
             location = raw_string.split(" ")
+            box = corners.split(" ")
             if name not in self.detected_objects:
                 self.detected_objects.append(name)
                 # Prepair message
                 insert = (' Data { '
                           + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
                           + 'brainstorm:informations ; '
-                          + 'brainstorm:pickable "1"^^xsd:int; '
-                          + 'brainstorm:placeable "0"^^xsd:int. '
+                          + 'brainstorm:xmin {}; '.format(box[1])
+                          + 'brainstorm:xmax {}; '.format(box[3])
+                          + 'brainstorm:ymin {}; '.format(box[0])
+                          + 'brainstorm:ymax {}. '.format(box[2])
 
                           + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
                           + 'brainstorm:informations ; '
@@ -45,12 +48,15 @@ class ontology():
         return True
 
     def get_info(self, name):
-        query = ("SELECT ?x ?y ?z ?status " +
+        query = ("SELECT ?x ?y ?z ?xmin ?ymin ?xmax ?ymax " +
                  "WHERE { " +
                  "brainstorm:{}_location brainstorm:x ?x. ".format(name) +
                  "brainstorm:{}_location brainstorm:y ?y. ".format(name) +
                  "brainstorm:{}_location brainstorm:z ?z. ".format(name) +
-                 "brainstorm:{}_status brainstorm:pickable ?status.".format(name) +
+                 "brainstorm:{}_status brainstorm:xmin ?xmin. ".format(name) +
+                 "brainstorm:{}_status brainstorm:ymin ?ymin. ".format(name) +
+                 "brainstorm:{}_status brainstorm:xmax ?xmax. ".format(name) +
+                 "brainstorm:{}_status brainstorm:ymax ?ymax. ".format(name) +
                  "}")
         # send POST request to server
         msg = {'query': self.prefix + query}
@@ -61,7 +67,11 @@ class ontology():
             float(res["results"]["bindings"][0]["x"]["value"]),
             float(res["results"]["bindings"][0]["y"]["value"]),
             float(res["results"]["bindings"][0]["z"]["value"])]
-        status = float(res["results"]["bindings"][0]["status"]["value"])
+        status = [
+            float(res["results"]["bindings"][0]["xmin"]["value"]),
+            float(res["results"]["bindings"][0]["ymin"]["value"]),
+            float(res["results"]["bindings"][0]["xmax"]["value"]),
+            float(res["results"]["bindings"][0]["ymax"]["value"])]
         return {name: {"location": location, "status": status}}
 
     def get_name(self):

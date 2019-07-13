@@ -5,6 +5,7 @@ from std_msgs.msg import String
 import os
 import tensorflow as tf
 import cv2
+import pyrealsense2 as rs
 import pathmagic
 
 # from collections import defaultdict
@@ -28,7 +29,20 @@ rospy.Subscriber("observe_table", String, callback)
 
 
 # Define the video stream
-cap = cv2.VideoCapture(0)  # Change only if you have more than one webcams
+# cap = cv2.VideoCapture(0)  # Change only if you have more than one webcams
+
+# Configure depth and color streams from Realsense
+pipeline = rs.pipeline()
+config = rs.config()
+config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+
+# Pointcloud persistency in case of dropped frames
+pc = rs.pointcloud()
+points = rs.points()
+
+# Start streaming
+profile = pipeline.start(config)
 
 # What model to download.
 # Models can be found here: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
@@ -69,9 +83,6 @@ TEST_IMAGE_PATHS = [os.path.join(PATH_TO_TEST_IMAGES_DIR, 'scene_{}.jpg'.format(
 with detection_graph.as_default():
     with tf.Session(graph=detection_graph) as sess:
         while True:
-            # for image in TEST_IMAGE_PATHS:
-            # image = TEST_IMAGE_PATHS[1]
-
             # Read frame from camera
             # ret, image_np = cap.read()
             image = cv2.imread(TEST_IMAGE_PATHS[5])
@@ -79,6 +90,39 @@ with detection_graph.as_default():
             height = int(image.shape[0] * 0.2)
             dim = (width, height)
             image_np = cv2.resize(image, dim)
+
+            ##=============== REALSENSE ======================
+            # # Read from Realsense and wait for a coherent pair of frames: depth and color
+            # frames = pipeline.wait_for_frames()
+            # # Align color images and depth images
+            # align = rs.align(rs.stream.color)
+            # aligned_frames = align.process(frames)
+            #
+            # depth_frame = aligned_frames.get_depth_frame()
+            # color_frame = aligned_frames.get_color_frame()
+            # if not depth_frame or not color_frame:
+            #     continue
+            #
+            # # Tell pointcloud object to map to this color frame
+            # pc.map_to(color_frame)
+            #
+            # # Generate the pointcloud and texture mappings
+            # points = pc.calculate(depth_frame)
+            #
+            # # Crop depth data:
+            # depth_scale = profile.get_device().first_depth_sensor().get_depth_scale()
+            # # Get camera intrinsics
+            # depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics
+            #
+            # # Convert images to numpy arrays
+            # depth_image = np.asanyarray(depth_frame.get_data()) * depth_scale
+            # image_np = np.asanyarray(color_frame.get_data())
+            #
+            # # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
+            # colorizer = rs.colorizer()
+            # depth_colormap = np.asanyarray(colorizer.colorize(depth_frame).get_data())
+            ##=====================================
+
             # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
             image_np_expanded = np.expand_dims(image_np, axis=0)
             # Extract image tensor
@@ -119,11 +163,15 @@ with detection_graph.as_default():
                         x = (b[1] + b[3])/2
                         y = (b[0] + b[2])/2
 
+                        ##============ REALSENSE ==============
+                        # using depth data for GPD no need in implementation of perception.
+                        ##=====================================
+
                         # Crop depth data:
                         object_class = category_index[int(classes[0][i])]['name']
                         if " " in object_class:
                             object_class = object_class.replace(" ", "_")
-                        data = "{0}/{1:.1} {2:.1} 0.1".format(object_class, x, y)
+                        data = "{0}/{1:.2} {2:.2} 0.15/{3:.3} {4:.3} {5:.3} {6:.3}".format(object_class, x, y, b[0], b[1], b[2], b[3])
 
                         pub.publish(data)
                         print("Detected a {0} with center {1:.1} {2:.1}.".format(object_class, x, y))
@@ -133,6 +181,7 @@ with detection_graph.as_default():
 
             # Display output
             cv2.imshow('object detection', image_np)
+            # cv2.imshow('depth detection', depth_image)
 
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
