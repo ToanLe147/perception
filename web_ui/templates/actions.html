@@ -5,17 +5,19 @@
 <form class="input-group" method="POST" action="/perception/knowleadge">
 
     <div class="container">
-        <div class="col">
-            <div class="d-flex justify-content-center mb-3 border border-light">
-                <img src="{{url_for('static', filename='images/observed_scene.jpg')}}"/>
+        <div class="row">
+            <div class="col-sm-4 align-items-center">
+                <div class="d-flex mb-3">
+                    <input name="btn_object" class="btn btn-primary btn-block" type="submit" value="Observe">
+                </div>
+
+                <div class="d-flex mb-3">
+                  <button name="btn_object" class="btn btn-info btn-block" type="submit" value="Update">Update</button>
+                </div>
             </div>
 
-            <div class="d-flex justify-content-left mb-3" onclick="myFunction()">
-                <input name="btn_object" class="btn btn-primary btn-block" type="submit" value="Observe">
-            </div>
-
-            <div class="d-flex justify-content-left mb-3">
-              <button name="btn_object" class="btn btn-info btn-block" type="submit" value="Update">Update</button>
+            <div class="col-sm-8 d-flex justify-content-center mb-3">
+                <img class=" border border-light" src="{{url_for('static', filename='images/observed_scene.jpg')}}" style="max-width:650px;"/>
             </div>
         </div>
     </div>
@@ -72,14 +74,14 @@
         {% endif %}
 
         <div class="container">
+            {% if status %}
             <div class="d-flex justify-content-center bg-dark text-white font-weight-bold mb-3 border border-light">Status</div>
             <div class="jumbotron text-center" style="margin-bottom:0">
-                {% if status %}
                 <p class="lead">
                     <input type="hidden" name="status[]" value="{{ status }}"/> {{ status }}
                 </p>
-                {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
 </form>

@@ -62,7 +62,7 @@ category_index = label_map_util.create_category_index(categories)
 
 # Loading test images
 PATH_TO_TEST_IMAGES_DIR = '/home/led/catkin_ws/src/robot_vision/src/models/research/object_detection/test_images'
-TEST_IMAGE_PATHS = [os.path.join(PATH_TO_TEST_IMAGES_DIR, 'scene_{}.jpg'.format(i)) for i in range(1, 6)]
+TEST_IMAGE_PATHS = [os.path.join(PATH_TO_TEST_IMAGES_DIR, 'scene_{}.jpg'.format(i)) for i in range(1, 8)]
 
 
 # Detection
@@ -73,9 +73,12 @@ with detection_graph.as_default():
             # image = TEST_IMAGE_PATHS[1]
 
             # Read frame from camera
-            ret, image_np = cap.read()
-            # image = cv2.imread(TEST_IMAGE_PATHS[4])
-            # image_np = cv2.resize(image, (400, 400))
+            # ret, image_np = cap.read()
+            image = cv2.imread(TEST_IMAGE_PATHS[5])
+            width = int(image.shape[1] * 0.2)
+            height = int(image.shape[0] * 0.2)
+            dim = (width, height)
+            image_np = cv2.resize(image, dim)
             # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
             image_np_expanded = np.expand_dims(image_np, axis=0)
             # Extract image tensor
@@ -111,10 +114,11 @@ with detection_graph.as_default():
 
                 # Update Ontology
                 for i, b in enumerate(boxes[0]):
-                    # i: index, b: box
+                    # i: index, b: box [%top, %left, %bottom, %right]
                     if scores[0][i] >= 0.5:
                         x = (b[1] + b[3])/2
                         y = (b[0] + b[2])/2
+
                         # Crop depth data:
                         object_class = category_index[int(classes[0][i])]['name']
                         if " " in object_class:

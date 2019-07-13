@@ -13,8 +13,6 @@ from ontology_manager import ontology
 
 
 db = ontology()
-detected_objects = []
-path = 'images'
 
 # Flask
 app = Flask(__name__)
@@ -30,10 +28,7 @@ listener.advertise()
 
 
 def callback(msg):
-    global detected_objects
-    if msg['data'] not in detected_objects:
-        db.update_ontology([msg['data']], "INSERT")
-        detected_objects.append(msg['data'])
+    db.update_ontology([msg['data']], "INSERT")
 
 
 # prevent cached responses
@@ -59,12 +54,13 @@ def move_to_knowleadge_base():
 @app.route("/visual")
 def move_to_visual():
     names = db.get_name()
-    graph = pygal.XY(stroke=False, style=DarkStyle)
+    graph = pygal.XY(stroke=False, style=DarkStyle, inverse_y_axis=True, range=(0, 1), xrange=(0, 1))
     graph.title = 'Object Position'
 
     for name in names:
         x, y, _ = db.get_info(name)[name]["location"]
         graph.add(name, [{'value': (x, y), 'node': {'r': 6}}])
+        # graph.add('Test', [(.1, .3), (.2, .3), (.2, .2), (.1, .2), (.1, .3)], stroke=True, fill=True)
 
     graph_data = graph.render_data_uri()
     return render_template("visual.html", graph_data=graph_data)
@@ -73,14 +69,12 @@ def move_to_visual():
 @app.route("/perception/knowleadge", methods=['POST'])
 def actions():
     listener.subscribe(callback)
-    global detected_objects
     btn = request.form['btn_object']
     names = request.form.getlist('handles[]')
     # detection_image = url_for("static", filename='images/observed_scene.jpg')
 
     if btn == "Observe":
         talker.publish(roslibpy.Message({'data': 'ok'}))
-        print(detected_objects)
 
     if btn == "Update":
         names = db.get_name()
@@ -90,7 +84,6 @@ def actions():
 
 @app.route("/perception/knowleadge/<name>", methods=['GET'])
 def show_pos(name):
-    # detection_image = os.path.join(path, 'observed_scene.jpg')
     pos = request.form.getlist('pos[]')
     status = request.form.getlist('status[]')
     names = db.get_name()
@@ -102,7 +95,6 @@ def show_pos(name):
 
 @app.route("/perception/knowleadge/<name>/<action>", methods=['GET'])
 def show_action(name, action):
-    # detection_image = os.path.join(path, 'observed_scene.jpg')
     pos = request.form.getlist('pos[]')
     status = request.form.getlist('status[]')
     names = db.get_name()
