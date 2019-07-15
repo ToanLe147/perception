@@ -22,6 +22,42 @@
     
 
 
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#DOWN -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#DOWN">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#LEFT -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#LEFT">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#RIGHT -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#RIGHT">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UP -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UP">
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasAbility -->
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#hasAbility">
@@ -59,38 +95,6 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
-
-
-    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#DOWN -->
-
-    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#DOWN">
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#LEFT -->
-
-    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#LEFT">
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#RIGHT -->
-
-    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#RIGHT">
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UP -->
-
-    <owl:DatatypeProperty rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#UP">
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
-    </owl:DatatypeProperty>
     
 
 
@@ -264,37 +268,6 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#driveTo">
         <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#process"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object">
-        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#objects"/>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_location -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_location">
-        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
-        <x rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</x>
-        <y rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</y>
-        <z rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</z>
-    </owl:NamedIndividual>
-    
-
-
-    <!-- http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_status -->
-
-    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#object_status">
-        <rdf:type rdf:resource="http://www.semanticweb.org/led/ontologies/2019/4/brainstorm.owl#informations"/>
-        <xmax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</xmax>
-        <xmin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</xmin>
-        <ymax rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</ymax>
-        <ymin rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</ymin>
     </owl:NamedIndividual>
     
 

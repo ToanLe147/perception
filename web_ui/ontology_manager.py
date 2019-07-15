@@ -14,37 +14,36 @@ class ontology():
                        + 'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> '
                        + 'PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> ')
 
-    def update_ontology(self, objects, type):
-        for detected_object in objects:
-            # type is DELETE or INSERT
-            name, raw_string, corners = detected_object.split("/")
-            location = raw_string.split(" ")
-            box = corners.split(" ")
-            if name not in self.detected_objects:
-                self.detected_objects.append(name)
-                # Prepair message
-                insert = (' Data { '
-                          + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
-                          + 'brainstorm:informations ; '
-                          + 'brainstorm:xmin {}; '.format(box[1])
-                          + 'brainstorm:xmax {}; '.format(box[3])
-                          + 'brainstorm:ymin {}; '.format(box[0])
-                          + 'brainstorm:ymax {}. '.format(box[2])
+    def update_ontology(self, object, type):
+        # type is DELETE or INSERT
+        name, raw_string, corners = object.split("/")
+        location = raw_string.split(" ")
+        box = corners.split(" ")
+        if name not in self.detected_objects:
+            self.detected_objects.append(name)
+            # Prepair message
+            insert = (' Data { '
+                      + 'brainstorm:{}_status a owl:NamedIndividual , '.format(name)
+                      + 'brainstorm:informations ; '
+                      + 'brainstorm:xmin {}; '.format(box[1])
+                      + 'brainstorm:xmax {}; '.format(box[3])
+                      + 'brainstorm:ymin {}; '.format(box[0])
+                      + 'brainstorm:ymax {}. '.format(box[2])
 
-                          + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
-                          + 'brainstorm:informations ; '
-                          + 'brainstorm:x {}; '.format(location[0])
-                          + 'brainstorm:y {}; '.format(location[1])
-                          + 'brainstorm:z {}. '.format(location[2])
+                      + 'brainstorm:{}_location a owl:NamedIndividual , '.format(name)
+                      + 'brainstorm:informations ; '
+                      + 'brainstorm:x {}; '.format(location[0])
+                      + 'brainstorm:y {}; '.format(location[1])
+                      + 'brainstorm:z {}. '.format(location[2])
 
-                          + 'brainstorm:{} a owl:NamedIndividual , brainstorm:objects ;'.format(name)
-                          + ' brainstorm:hasLocation brainstorm:{}_location; '.format(name)
-                          + 'brainstorm:hasStatus brainstorm:{}_status.'.format(name)
-                          + '}'
-                          )
-                # send POST request to server
-                msg = {'update': self.prefix + type + insert}
-                requests.post(url=self.ontology_server+'update', headers=self.header, data=msg)
+                      + 'brainstorm:{} a owl:NamedIndividual , brainstorm:objects ;'.format(name)
+                      + ' brainstorm:hasLocation brainstorm:{}_location; '.format(name)
+                      + 'brainstorm:hasStatus brainstorm:{}_status.'.format(name)
+                      + '}'
+                      )
+            # send POST request to server
+            msg = {'update': self.prefix + type + insert}
+            requests.post(url=self.ontology_server+'update', headers=self.header, data=msg)
         return True
 
     def get_info(self, name):
@@ -75,6 +74,7 @@ class ontology():
         return {name: {"location": location, "status": status}}
 
     def get_name(self):
+        objects = []
         query = ("SELECT ?name " +
                  "WHERE {?name a  owl:NamedIndividual , brainstorm:objects .}")
         msg = {'query': self.prefix + query}
@@ -82,6 +82,28 @@ class ontology():
         res = json.loads(r.content)
         for i in res["results"]["bindings"]:
             _, name = i["name"]["value"].split("#")
-            if name not in self.detected_objects:
-                self.detected_objects.append(name)
-        return self.detected_objects
+            objects.append(name)
+        return objects
+
+    def get_relative_position(self, name):
+        left = []
+        right = []
+        up = []
+        down = []
+        ref_object = self.get_info(name)[name]['status']
+        for object in self.detected_objects:
+            if name == object:
+                continue
+
+            target_object = self.get_info(object)[object]['status']
+
+            if target_object[0] > ref_object[2]:
+                right.append(object)
+            if target_object[2] < ref_object[0]:
+                left.append(object)
+            if target_object[1] > ref_object[3]:
+                up.append(object)
+            if target_object[3] < ref_object[1]:
+                down.append(object)
+
+        return {"LEFT": left, "RIGHT": right, "UP": up, "DOWN": down}

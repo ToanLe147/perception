@@ -15,6 +15,7 @@ from object_detection.utils import visualization_utils as vis_util
 # ROS communication
 rospy.init_node('testing_detection')
 pub = rospy.Publisher('objects_detected', String, queue_size=10)
+pubimg = rospy.Publisher('image_detected', String, queue_size=10)
 rate = rospy.Rate(20)
 
 user_command = ""
@@ -29,20 +30,22 @@ rospy.Subscriber("observe_table", String, callback)
 
 
 # Define the video stream
-# cap = cv2.VideoCapture(0)  # Change only if you have more than one webcams
+cap = cv2.VideoCapture(0)  # Change only if you have more than one webcams
 
-# Configure depth and color streams from Realsense
-pipeline = rs.pipeline()
-config = rs.config()
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-
-# Pointcloud persistency in case of dropped frames
-pc = rs.pointcloud()
-points = rs.points()
-
-# Start streaming
-profile = pipeline.start(config)
+##=============== REALSENSE ======================
+# # Configure depth and color streams from Realsense
+# pipeline = rs.pipeline()
+# config = rs.config()
+# config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+# config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+#
+# # Pointcloud persistency in case of dropped frames
+# pc = rs.pointcloud()
+# points = rs.points()
+#
+# # Start streaming
+# profile = pipeline.start(config)
+##=====================================
 
 # What model to download.
 # Models can be found here: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
@@ -85,7 +88,8 @@ with detection_graph.as_default():
         while True:
             # Read frame from camera
             # ret, image_np = cap.read()
-            image = cv2.imread(TEST_IMAGE_PATHS[5])
+
+            image = cv2.imread(TEST_IMAGE_PATHS[6])
             width = int(image.shape[1] * 0.2)
             height = int(image.shape[0] * 0.2)
             dim = (width, height)
@@ -154,7 +158,9 @@ with detection_graph.as_default():
             if user_command == "ok":
                 # Upload result image to web ui
                 path = '/home/led/catkin_ws/src/robot_vision/src/web_ui/static/images'
-                cv2.imwrite(os.path.join(path, 'observed_scene.jpg'), image_np)
+                img_name = 'observed_scene_{}.jpg'.format(int(rospy.get_time()))
+                cv2.imwrite(os.path.join(path, img_name), image_np)
+                pubimg.publish(img_name)
 
                 # Update Ontology
                 for i, b in enumerate(boxes[0]):
