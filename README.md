@@ -2,7 +2,11 @@
 This project is aiming to create a perception system for robot manipulator
 # Project is under-developing
 
-# Installation before running code
+# Things to do before running code
+1. Install Apache-fuseki server
+2. Install Tensorflow
+3. Install Librealsense 2
+4. Install Flask
 
 # Running code
 Run each line below in seperate terminal tab
